@@ -1,0 +1,82 @@
+; 例4.21
+
+            N=10
+STACK       SEGMENT STACK 'STACK'
+            DW 100H DUP(?)
+TOP         LABEL WORD
+STACK       ENDS
+DATA        SEGMENT
+INX     DB  N 
+        DB  N DUP(0) ;初始化，随后添加随机数
+        DB  100 DUP(0)
+STRING1		DB 'PLEASE INPUT DATA: $'
+DATA		ENDS
+CODE		SEGMENT
+			ASSUME CS:CODE,DS:DATA,ES:DATA,SS:STACK
+
+START:
+		MOV AX,DATA
+		MOV DS,AX
+		MOV ES,AX
+		MOV AX,STACK
+		MOV SS,AX
+		LEA SP,TOP         
+		MOV CL, INX
+		MOV CH, 0
+        LEA SI, INX+1
+        MOV AH, 4
+        MOV AL, 17
+LOOP1:  
+        MOV [SI],AL
+        INC SI
+        ADD AL,AH
+        LOOP LOOP1   
+		CALL FUNC2
+		INT 21H
+		
+FUNC2	PROC NEAR
+		LEA SI,INX
+		XOR CX,CX
+		MOV CL,[SI]
+		DEC CX
+B10:	INC SI
+		MOV DI,SI
+		PUSH SI
+		PUSH CX
+		MOV AL,[SI]
+B20:	INC SI
+		CMP AL,[SI]
+		JAE B30
+		MOV AL,[SI]
+		MOV DI,SI
+B30:	LOOP B20
+		POP CX
+		POP SI
+		MOV AH,[SI]
+		MOV [SI],AL
+		MOV [DI],AH
+		LOOP B10
+		RET		
+FUNC2 	ENDP
+	
+CODE 	ENDS
+		END START
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

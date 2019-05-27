@@ -1,0 +1,57 @@
+; 例4.4
+
+
+N=500
+STACK SEGMENT STACK 'STACK'
+        DW 100H DUP(?)
+TOP LABEL WORD
+STACK ENDS
+DATA SEGMENT
+SOURCE LABEL BYTE
+DESTINATION DB N DUP(0)  ;初始化，随后添加随机数
+NUMBER DW ?
+DATA ENDS
+CODE SEGMENT 
+    ASSUME CS:CODE,DS:DATA,ES:DATA,SS:STACK  
+
+ START:
+    MOV AX,DATA
+    MOV DS,AX
+    MOV ES,AX
+    MOV AX,STACK
+    MOV SS,AX
+    LEA SP,TOP
+    XOR AX,AX
+    MOV NUMBER,AX    
+    
+    MOV CX, N             ;循环随机生成500个数
+    LEA SI, DESTINATION
+    MOV BL, 97
+    MOV AL, 17
+LOOP1:  
+    MOV [SI],AL
+    INC SI
+    ADD AL,BL
+    LOOP LOOP1    
+    
+    MOV CX,N
+    LEA SI,SOURCE
+    LEA DI,DESTINATION   
+
+MOVE1:
+    MOV AL,[SI]
+    INC SI
+    CMP AL,0FFH
+    JZ MOVE2
+    MOV [DI],AL
+    INC DI
+    INC NUMBER  
+    
+MOVE2:
+    LOOP MOVE1   
+    
+MOVE_END:
+    MOV AH,4CH   
+    INT 21H      
+CODE ENDS 
+     END START    

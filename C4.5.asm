@@ -1,0 +1,63 @@
+; 例4.4
+
+
+
+N=8 
+STACK SEGMENT STACK'STACK' 
+DW 100H DUP(?) 
+TOP LABEL WORD 
+STACK ENDS 
+DATA SEGMENT 
+DATABUF DW N 
+        DB N DUP(0)
+DATA ENDS 
+CODE SEGMENT 
+        ASSUME CS:CODE , DS:DATA , ES:DATA, SS:STACK 
+START: 
+MOV AX, DATA 
+MOV DS, AX 
+MOV ES, AX 
+MOV AX, STACK 
+MOV SS, AX 
+LEA SP, TOP 
+
+MOV CX, DATABUF             ;随机数生成
+LEA SI, DATABUF + 2 
+MOV BL, 23
+MOV AL, 11 
+
+LP: 
+
+MOV [SI], AL 
+INC SI 
+ADD AL, BL 
+LOOP LP 
+
+MOV CX, DATABUF          
+DEC CX                   ;外循环次数
+LEA SI, DATABUF + 2      ;SI指向首地址
+ADD SI, CX               ;SI指向末地址
+
+LP1:                     ;外循环开始
+
+PUSH CX 
+PUSH SI 
+
+LP2:                     ;内循环开始
+MOV AL,[SI] 
+CMP AL, [SI-1] 
+JAE NOXCHG 
+XCHG AL, [SI-1] 
+MOV [SI], AL 
+
+NOXCHG: 
+
+DEC SI 
+LOOP LP2 
+POP SI 
+POP CX 
+LOOP LP1 
+MOV AH,4CH
+INT 21H
+CODE ENDS
+    END START

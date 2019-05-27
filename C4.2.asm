@@ -1,0 +1,51 @@
+; 例4.2
+
+
+
+STACK SEGMENT STACK 'STACK'
+    DW 100H DUP(?)
+TOP LABEL WORD 
+STACK ENDS 
+DATA SEGMENT 
+VAR1 DB 46H     ;假设的值
+VAR2 DB 15H 
+VAR3 DB 0A2H 
+DATA ENDS 
+CODE SEGMENT 
+    ASSUME CS : CODE, DS : DATA, ES : DATA , SS : STACK 
+
+START:                        
+
+    MOV AX, DATA 
+    MOV DS, AX 
+    MOV ES, AX 
+    MOV AX, STACK 
+    MOV SS, AX 
+    LEA SP,TOP 
+    MOV AL,VAR1    ;用户编写的内容
+    CMP AL,VAR2 
+    JAE NO_CHG1 
+    XCHG AL,VAR2 
+
+NO_CHG1: 
+
+    CMP AL, VAR3 
+    JAE NO_CHG2 
+    XCHG AL, VAR3 
+
+NO_CHG2: 
+
+    MOV VAR1, AL     ;最大值保存到VAR1
+    MOV AL, VAR2 
+    CMP AL, VAR3 
+    JAE NO_CHG3
+    XCHG AL,VAR3
+    MOV VAR2,AL      ;次大值保存到VAR2
+
+NO_CHG3:
+
+    MOV AH,4CH
+    INT 21H
+
+CODE ENDS
+    ENDS START
